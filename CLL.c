@@ -7,15 +7,13 @@ void delete();
 void display();
 
 struct node *ptr,*cpt,*newnode;
-int ans,key;
+int ans;
 
 struct node
 {
-	struct node * llink;
+	struct node * llink,* rlink;
 	int data;
-	struct node * rlink;
-};
-struct node *header;
+}*header;
 
 void main()
 {
@@ -31,22 +29,22 @@ void main()
 	switch(op)
 	{
 		case 1: create();
-			break;
+				break;
 		case 2: insert();
-			break;
+				break;
 		case 3: delete();
-			break;
+				break;
 		case 4:	display();
-			break;
-		default: printf("Enter valid input !!");
+				break;
+		default: printf("Enter valid input !!\n");
 	}
-	printf("Do you want to Continue ?(1-Yes): ");
+	printf("Do you want to Continue ?(1=Yes): ");
 	scanf("%d",&c);
 	}while(c==1);
 }
 
 void create()
-{
+{	
 	ptr=header;
 	do
 	{
@@ -65,46 +63,61 @@ void create()
 
 void insert()
 {
-	int an;
-	printf("Choose your preference:\n1: Insert at End\n2: Insert Before Specified Position\n");
-	scanf("%d",&an);
-	switch(an)
+	int an,c,p;
+	ptr=header;
+	if(ptr->rlink==NULL)
+		printf("First Create a List !!\n");
+	else
 	{
-		case 1: while(ptr->rlink!=header)
-					ptr=ptr->rlink;
-			newnode=(struct node*)malloc(sizeof(struct node));
-			printf("Enter the data: ");
-			scanf("%d",&newnode->data);
-			newnode->rlink=header;
-			newnode->llink=ptr;
-			ptr->rlink=newnode;
-			break;
-		case 2: printf("Enter the value of the node after the position of the node to be inserted :\n");
-			scanf("%d",&key);
-			while(ptr->rlink!=header && ptr->data!=key)
-				ptr=ptr->rlink;
-			if(ptr->rlink==header && ptr->data!=key)
-				printf("Key Not Found !!");
-			else
-			{
-				newnode=(struct node*)malloc(sizeof(struct node));
-				printf("Enter the data: ");
-				scanf("%d",&newnode->data); 
-				newnode->rlink=ptr;
-				ptr=ptr->llink;
-				ptr->rlink=newnode;
-				newnode->llink=ptr;
-				ptr=newnode->rlink;
-				ptr->llink=newnode;
-			}
-			break;
-		default: printf("Enter valid input !!");
+		printf("Choose your preference:\n1: Insert at End\n2: Insert Before Specified Position\n");
+		scanf("%d",&an);
+		switch(an)
+		{
+			case 1: while(ptr->rlink!=header)
+						ptr=ptr->rlink;
+					newnode=(struct node*)malloc(sizeof(struct node));
+					printf("Enter the data: ");
+					scanf("%d",&newnode->data);
+					newnode->rlink=header;
+					newnode->llink=ptr;
+					ptr->rlink=newnode;
+					break;
+			case 2: printf("Enter Position (Node will be inserted at Previous Position):\n");
+				scanf("%d",&p);
+				c=0;
+				if(p<1)
+					printf("Invalid input !!");
+				else
+				{
+					while(ptr->rlink!=header && c!=p)
+					{
+						ptr=ptr->rlink;
+						c++;
+					}
+					if(ptr->rlink==header && c!=p)
+						printf("Position Not Found !!");
+					else
+					{
+						newnode=(struct node*)malloc(sizeof(struct node));
+						printf("Enter the data: ");
+						scanf("%d",&newnode->data); 
+						newnode->rlink=ptr;
+						ptr=ptr->llink;
+						ptr->rlink=newnode;
+						newnode->llink=ptr;
+						ptr=newnode->rlink;
+						ptr->llink=newnode;
+					}
+				}
+				break;
+			default: printf("Enter valid input !!");
+		}
 	}
 }	
 
 void delete()
 {
-	int an;
+	int an,c,p;
 	ptr=header;
 	if(ptr->rlink==NULL)
 		printf("Empty List !! Deletion Not Possible !!\n");
@@ -115,46 +128,93 @@ void delete()
 		switch(an)
 		{
 			case 1: ptr=ptr->rlink;
-				header->rlink=ptr->rlink;
-				free(ptr);
-				break;
-			case 2: printf("Enter the value of the node before the node to be deleted :\n");
-				scanf("%d",&key);
-				while(ptr->rlink!=NULL && ptr->data!=key)
+				if(ptr->rlink==NULL)
+				{
+					header->rlink=NULL;
+					free(ptr);
+				}
+				else
+				{
 					ptr=ptr->rlink;
-				if(ptr->rlink==NULL && ptr->data!=key)
-					printf("Key Not Found !!");
+					ptr->llink=header;
+					ptr=header->rlink;
+					header->rlink=ptr->rlink;
+					free(ptr);
+				}
+				break;
+			case 2: printf("Enter Position (Next node will be deleted):\n");
+				scanf("%d",&p);
+				c=0;
+				while(ptr->rlink!=header && c!=p)
+				{
+					ptr=ptr->rlink;
+					c++;
+				}
+				if(ptr->rlink==header && c!=p)
+					printf("Position Not Found !!");
 				else if(ptr->rlink==header)
 					printf("No next node to be deleted !!\n");
 				else
 				{
 					cpt=ptr->rlink;
-					ptr->rlink=header;
-					header->llink=ptr;
+					ptr->rlink=cpt->rlink;
 					free(cpt);
 				}
 				break;
-			default: printf("Enter valid input !!");
+			default: printf("Enter valid input !!\n");
 		}
 	}
 }
 
 void display()
 {
+	int an;
 	ptr=header->rlink;
 	if(ptr==NULL)
 		printf("List is Empty !!\n");
 	else
 	{
-		printf("LLink | Data | RLink :\n");
-		while(ptr->rlink!=header)
+		printf("Enter your preference:\n1: Traverse front to end\n2: Traverse end to first\n3: Print both traversal\n");
+		scanf("%d",&an);
+		switch(an)
 		{
-			printf("%p | %d | %p\n",ptr->llink,ptr->data,ptr->rlink);
-			ptr=ptr->rlink;
+			case 1:	printf("Data :\n");
+					while(ptr->rlink!=header)
+					{
+						printf("%d ",ptr->data);
+						ptr=ptr->rlink;
+					}
+					if(ptr->rlink==header)
+						printf("%d\n",ptr->data);
+					break;
+			case 2:	ptr=header->llink;
+					printf("Data :\n");
+					while(ptr->llink!=header)
+					{
+						printf("%d ",ptr->data);
+						ptr=ptr->llink;
+					}
+					if(ptr->llink==header)
+						printf("%d\n",ptr->data);
+					break;
+			case 3:	printf("Data :\n");
+					while(ptr->rlink!=header)
+					{
+						printf("%d ",ptr->data);
+						ptr=ptr->rlink;
+					}
+					if(ptr->rlink==header)
+						printf("%d || ",ptr->data);
+					while(ptr->llink!=header)
+					{
+						printf("%d ",ptr->data);
+						ptr=ptr->llink;
+					}
+					if(ptr->llink==header)
+						printf("%d\n",ptr->data);
+					break;
+			default:printf("Enter valid input !!");
 		}
-		if(ptr->rlink==header)
-			printf("%p | %d | %p\n",ptr->llink,ptr->data,ptr->rlink);
 	}
 }
-
 
