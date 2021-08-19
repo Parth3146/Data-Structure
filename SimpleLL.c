@@ -188,13 +188,11 @@ void display()
 	else
 	{
 		printf("Data :\n");
-		while(ptr->link!=NULL)
+		while(ptr != NULL)
 		{
 			printf("%d\n",ptr->data);
 			ptr=ptr->link;
 		}
-		if(ptr->link==NULL)
-			printf("%d\n",ptr->data);
 	}
 }
 
